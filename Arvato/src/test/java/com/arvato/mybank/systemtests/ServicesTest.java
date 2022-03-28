@@ -9,7 +9,11 @@ import com.arvato.mybank.impl.services.AccountServicesImpl;
 import com.arvato.mybank.impl.services.TransactionServicesImpl;
 
 import junit.framework.Assert;
-
+/**
+ * ServicesTest
+ * @author paulinelow
+ *
+ */
 @SuppressWarnings("deprecation")
 public class ServicesTest {
 	private TransactionServicesImpl transactionServices = new TransactionServicesImpl();

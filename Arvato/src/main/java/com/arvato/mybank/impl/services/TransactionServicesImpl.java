@@ -1,17 +1,18 @@
 package com.arvato.mybank.impl.services;
 
 import java.io.File;
+
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.Iterator;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-import org.apache.poi.hssf.usermodel.HSSFSheet;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.xssf.usermodel.XSSFCell;
+import static com.arvato.mybank.constants.Constants.INT_ZERO_VALUE;
+import static com.arvato.mybank.constants.Constants.ERROR_EXCEL_FAIL_FILE;
+import static com.arvato.mybank.constants.Constants.ERROR_EXCEL_FAIL_WORKBOOK;
+
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -19,8 +20,13 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import com.arvato.mybank.api.services.TransactionServices;
 import com.arvato.mybank.classes.Account;
 import com.arvato.mybank.constants.Constants;
-
+/**
+ * TransactionServices implementation
+ * @author paulinelow
+ *
+ */
 public class TransactionServicesImpl implements TransactionServices{
+	Logger logger = Logger.getLogger(TransactionServicesImpl.class.getName());
 
 	public TransactionServicesImpl() {
 		super();
@@ -28,7 +34,7 @@ public class TransactionServicesImpl implements TransactionServices{
 
 	public Double checkBalance(Integer accountId) {
 		Constants constants = new Constants();
-		if(accountId != null && accountId>0) {
+		if(accountId != null && accountId>INT_ZERO_VALUE) {
 			for(Account account:constants.getAccountList()) {
 				if(accountId.equals(account.getAccountId())) {
 					return account.getBalance();
@@ -76,6 +82,7 @@ public class TransactionServicesImpl implements TransactionServices{
 		}
 	}
 	
+	@SuppressWarnings("unused")
 	public void updateAccountList(Integer accountId, Double balance, Constants constants) {
 		File myFile = new File(constants.getAccountFilePath()+constants.getAccountExcelFile()); 
 		FileInputStream fis;
@@ -83,7 +90,7 @@ public class TransactionServicesImpl implements TransactionServices{
 		try {
 			fis = new FileInputStream(myFile);
 			myWorkBook = new XSSFWorkbook (fis); 
-			XSSFSheet mySheet = myWorkBook.getSheetAt(0);
+			XSSFSheet mySheet = myWorkBook.getSheetAt(INT_ZERO_VALUE);
 			myWorkBook.removeSheetAt(0);
 			
 		} catch (FileNotFoundException e) {
@@ -94,12 +101,10 @@ public class TransactionServicesImpl implements TransactionServices{
 		
 		if(myWorkBook!=null) {
 			XSSFSheet mySheet = myWorkBook.createSheet("account");
-			//create header row
-			XSSFRow rowHead = mySheet.createRow(0);
+			XSSFRow rowHead = mySheet.createRow(INT_ZERO_VALUE);
 			rowHead.createCell(0).setCellValue("accountId");
 			rowHead.createCell(1).setCellValue("balance");
 			
-			//create row data
 			for(int i=0;i<constants.getAccountList().size();i++) {
 				XSSFRow row = mySheet.createRow(i+1);
 				row.createCell(0).setCellValue(constants.getAccountList().get(i).getAccountId());
@@ -110,13 +115,14 @@ public class TransactionServicesImpl implements TransactionServices{
 				FileOutputStream fileOut = new FileOutputStream(constants.getAccountFilePath()+ constants.getAccountExcelFile());
 				myWorkBook.write(fileOut);
 				fileOut.close();
-				System.out.println("Excel is written successfully");    
 
 			} catch (FileNotFoundException e) {
+	            logger.log(Level.SEVERE, ERROR_EXCEL_FAIL_FILE);
 				e.printStackTrace();
 			} catch (IOException e) {
+	            logger.log(Level.SEVERE, ERROR_EXCEL_FAIL_WORKBOOK);
 				e.printStackTrace();
-			}
+			} 
 			
 		}
 		

@@ -5,7 +5,11 @@ import java.util.List;
 import com.arvato.mybank.api.services.LoginServices;
 import com.arvato.mybank.classes.User;
 import com.arvato.mybank.constants.Constants;
-
+/**
+ * LoginServices implementation
+ * @author paulinelow
+ *
+ */
 public class LoginServicesImpl implements LoginServices {
 	
 	public LoginServicesImpl() {

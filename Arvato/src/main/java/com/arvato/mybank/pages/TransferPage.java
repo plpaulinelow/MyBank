@@ -7,7 +7,6 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import javax.swing.JOptionPane;
 
 import com.arvato.mybank.classes.Account;
@@ -15,6 +14,29 @@ import com.arvato.mybank.constants.Constants;
 import com.arvato.mybank.impl.services.AccountServicesImpl;
 import com.arvato.mybank.impl.services.TransactionServicesImpl;
 
+import static com.arvato.mybank.constants.Constants.CONSTANTS_ID;
+import static com.arvato.mybank.constants.Constants.USERNAME;
+import static com.arvato.mybank.constants.Constants.ACCOUNT_ID;
+import static com.arvato.mybank.constants.Constants.HOME_PAGE;
+import static com.arvato.mybank.constants.Constants.HOME_PAGE_JSP;
+import static com.arvato.mybank.constants.Constants.TRANSFER_PAGE_JSP;
+import static com.arvato.mybank.constants.Constants.TRANSFER;
+import static com.arvato.mybank.constants.Constants.MESSAGE_TRANSFER_AMOUNT_CANNOT_BE_EMPTY;
+import static com.arvato.mybank.constants.Constants.MESSAGE_ACCOUNT_ID_MUST_BE_ENTERED;
+import static com.arvato.mybank.constants.Constants.MESSAGE_THIRD_PARTY_ACCOUNT_DOES_NOT_EXISTS;
+import static com.arvato.mybank.constants.Constants.MESSAGE_CURRENT_ACCOUNT_DOES_NOT_EXIST;
+import static com.arvato.mybank.constants.Constants.MESSAGE_UNABLE_TO_TRANSFER_TO_SAME_ACOUNT;
+import static com.arvato.mybank.constants.Constants.MESSAGE_INSUFFICENT_BALANCE_TO_TRANSFER;
+import static com.arvato.mybank.constants.Constants.MESSAGE_TRANSFER_AMOUNT_MUST_BE_GREATER_THAN_ZERO;
+import static com.arvato.mybank.constants.Constants.ERROR;
+import static com.arvato.mybank.constants.Constants.TRANSFER_ACCOUNT_ID;
+import static com.arvato.mybank.constants.Constants.TRANSFER_AMOUNT;
+
+/**
+ * TransferPage controller
+ * @author paulinelow
+ *
+ */
 @WebServlet("/transferPage")
 public class TransferPage extends HttpServlet{
 
@@ -27,66 +49,70 @@ public class TransferPage extends HttpServlet{
 	}
 	
 	public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException{	
-		HttpSession ses = request.getSession();
-		String constantsId = request.getParameter("constantsId");
-		String username = request.getParameter("username");
-		Integer accountId = request.getParameter("accountId").isEmpty()?0:Integer.parseInt(request.getParameter("accountId"));
+		String constantsId = request.getParameter(CONSTANTS_ID);
+		String username = request.getParameter(USERNAME);
+		Integer accountId = request.getParameter(ACCOUNT_ID).isEmpty()?0:Integer.parseInt(request.getParameter(ACCOUNT_ID));
 		Constants constants = (Constants) request.getSession().getAttribute(constantsId);		
 		
-		if(request.getParameter("homePage")!=null) {
-			request.setAttribute("constantsId", constantsId);
-			request.setAttribute("username", username);
-			request.setAttribute("accountId", accountId);
-			request.getRequestDispatcher("HomePage.jsp").forward(request, response);
+		if(request.getParameter(HOME_PAGE)!=null) {
+			request.setAttribute(CONSTANTS_ID, constantsId);
+			request.setAttribute(USERNAME, username);
+			request.setAttribute(ACCOUNT_ID, accountId);
+			request.getRequestDispatcher(HOME_PAGE_JSP).forward(request, response);
 		}
-		else if(request.getParameter("transfer")!=null) {
-			Integer transferAccountId = request.getParameter("transferAccountId").isEmpty()?0: Integer.parseInt(request.getParameter("transferAccountId"));
+		else if(request.getParameter(TRANSFER)!=null) {
+			Integer transferAccountId = request.getParameter(TRANSFER_ACCOUNT_ID).isEmpty()?0: Integer.parseInt(request.getParameter(TRANSFER_ACCOUNT_ID));
 			Account currentAccount = accountServices.retrieveAccountFromAccountId(accountId);
 			Account transferAccount = accountServices.retrieveAccountFromAccountId(transferAccountId);
 
-			if(request.getParameter("transferAmount").isEmpty()) {
-				JOptionPane.showMessageDialog(null, "Transfer amount cannot be empty..", 
-						"Error",JOptionPane.ERROR_MESSAGE);
+			if(request.getParameter(TRANSFER_AMOUNT).isEmpty()) {
+				JOptionPane.showMessageDialog(null, MESSAGE_TRANSFER_AMOUNT_CANNOT_BE_EMPTY, 
+						ERROR,JOptionPane.ERROR_MESSAGE);
 				request.getSession().setAttribute(constantsId, constants);
-				request.setAttribute("constantsId", constantsId);
-				request.setAttribute("username", username);
-				request.setAttribute("accountId", accountId);
-				request.getRequestDispatcher("TransferPage.jsp").forward(request, response);
+				request.setAttribute(CONSTANTS_ID, constantsId);
+				request.setAttribute(USERNAME, username);
+				request.setAttribute(ACCOUNT_ID, accountId);
+				request.getRequestDispatcher(TRANSFER_PAGE_JSP).forward(request, response);
 			}
-			Double transferAmount = Double.parseDouble(request.getParameter("transferAmount"));
+			Double transferAmount = Double.parseDouble(request.getParameter(TRANSFER_AMOUNT));
 			Boolean errorExists=false;
+			if(transferAmount<=0) {
+				JOptionPane.showMessageDialog(null, MESSAGE_TRANSFER_AMOUNT_MUST_BE_GREATER_THAN_ZERO, 
+						ERROR,JOptionPane.ERROR_MESSAGE);
+				errorExists=true;
+			}
 			if(transferAccountId == null || transferAccountId==0) {
-				JOptionPane.showMessageDialog(null, "Account id must be entered", 
-						"Error",JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(null, MESSAGE_ACCOUNT_ID_MUST_BE_ENTERED, 
+						ERROR,JOptionPane.ERROR_MESSAGE);
 				errorExists=true;
 			}else if(transferAccount==null) {
-				JOptionPane.showMessageDialog(null, "Third Party Account does not exist..", 
-						"Error",JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(null, MESSAGE_THIRD_PARTY_ACCOUNT_DOES_NOT_EXISTS, 
+						ERROR,JOptionPane.ERROR_MESSAGE);
 				errorExists=true;
 			}else if(currentAccount==null) {
-				JOptionPane.showMessageDialog(null, "Current Account does not exist..", 
-						"Error",JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(null, MESSAGE_CURRENT_ACCOUNT_DOES_NOT_EXIST, 
+						ERROR,JOptionPane.ERROR_MESSAGE);
 				errorExists=true;
 			}else if(currentAccount.getAccountId().intValue()==transferAccount.getAccountId().intValue()) {
-				JOptionPane.showMessageDialog(null, "Unable to transfer to the same account id..", 
-						"Error",JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(null, MESSAGE_UNABLE_TO_TRANSFER_TO_SAME_ACOUNT, 
+						ERROR,JOptionPane.ERROR_MESSAGE);
 				errorExists=true;
 			}
 			else if(currentAccount.getBalance()<transferAmount) {
-				JOptionPane.showMessageDialog(null, "Insufficient balance to proceed with transfer..", 
-						"Error",JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(null,MESSAGE_INSUFFICENT_BALANCE_TO_TRANSFER, 
+						ERROR,JOptionPane.ERROR_MESSAGE);
 				errorExists=true;
 			}
 			request.getSession().setAttribute(constantsId, constants);
-			request.setAttribute("constantsId", constantsId);
-			request.setAttribute("username", username);
-			request.setAttribute("accountId", accountId);
+			request.setAttribute(CONSTANTS_ID, constantsId);
+			request.setAttribute(USERNAME, username);
+			request.setAttribute(ACCOUNT_ID, accountId);
 			if(!errorExists) {
 				transactionServices.transferAmount(accountId, transferAccountId, transferAmount);
 				
-				request.getRequestDispatcher("HomePage.jsp").forward(request, response);
+				request.getRequestDispatcher(HOME_PAGE_JSP).forward(request, response);
 			}else {
-				request.getRequestDispatcher("TransferPage.jsp").forward(request, response);
+				request.getRequestDispatcher(TRANSFER_PAGE_JSP).forward(request, response);
 
 			}
 		}

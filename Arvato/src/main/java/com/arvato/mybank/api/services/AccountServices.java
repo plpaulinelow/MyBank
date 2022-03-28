@@ -1,8 +1,11 @@
 package com.arvato.mybank.api.services;
 
 import com.arvato.mybank.classes.Account;
-import com.arvato.mybank.constants.Constants;
-
+/**
+ * Interface for Account Services
+ * @author paulinelow
+ *
+ */
 public interface AccountServices {
 
 	/**

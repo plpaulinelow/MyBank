@@ -13,6 +13,27 @@ import javax.swing.JOptionPane;
 import com.arvato.mybank.constants.Constants;
 import com.arvato.mybank.impl.services.TransactionServicesImpl;
 
+import static com.arvato.mybank.constants.Constants.CONSTANTS_ID;
+import static com.arvato.mybank.constants.Constants.USERNAME;
+import static com.arvato.mybank.constants.Constants.ACCOUNT_ID;
+import static com.arvato.mybank.constants.Constants.HOME_PAGE;
+import static com.arvato.mybank.constants.Constants.HOME_PAGE_JSP;
+import static com.arvato.mybank.constants.Constants.CHECK_BALANCE_PAGE_JSP;
+import static com.arvato.mybank.constants.Constants.WITHDRAWAL_PAGE_JSP;
+import static com.arvato.mybank.constants.Constants.BALANCE;
+import static com.arvato.mybank.constants.Constants.WITHDRAWAL;
+import static com.arvato.mybank.constants.Constants.WITHDRAWAL_AMOUNT;
+import static com.arvato.mybank.constants.Constants.MESSAGE_WITHDRAWAL_AMOUNT_CANNOT_BE_EMPTY;
+import static com.arvato.mybank.constants.Constants.MESSAGE_WITHDRAWAL_AMOUNT_MUST_BE_GREATER_THAN_ZERO;
+import static com.arvato.mybank.constants.Constants.MESSAGE_INSUFFICIENT_BALANCE_FOR_WITHDRAWAL;
+import static com.arvato.mybank.constants.Constants.ERROR;
+
+
+/**
+ * WithdrawalPage controller
+ * @author paulinelow
+ *
+ */
 @WebServlet("/withdrawalPage")
 public class WithdrawalPage extends HttpServlet{
 	private static final long serialVersionUID = 1L;
@@ -24,53 +45,53 @@ public class WithdrawalPage extends HttpServlet{
 	
 	public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException{	
 		HttpSession ses = request.getSession();
-		Integer accountId = Integer.parseInt(request.getParameter("accountId"));
-		String username = request.getParameter("username");
-		String constantsId = request.getParameter("constantsId");
+		Integer accountId = Integer.parseInt(request.getParameter(ACCOUNT_ID));
+		String username = request.getParameter(USERNAME);
+		String constantsId = request.getParameter(CONSTANTS_ID);
 		Constants constants = (Constants) request.getSession().getAttribute(constantsId);
 		Double balance = transactionServices.checkBalance(accountId);
 		
-		if(request.getParameter("withdraw")!=null) {
-			if(request.getParameter("withdrawalAmount").isEmpty()) {
-				JOptionPane.showMessageDialog(null, "Withdrawal amount cannot be empty..", 
-						"Error",JOptionPane.ERROR_MESSAGE);
+		if(request.getParameter(WITHDRAWAL)!=null) {
+			if(request.getParameter(WITHDRAWAL_AMOUNT).isEmpty()) {
+				JOptionPane.showMessageDialog(null, MESSAGE_WITHDRAWAL_AMOUNT_CANNOT_BE_EMPTY, 
+						ERROR,JOptionPane.ERROR_MESSAGE);
 				request.getSession().setAttribute(constantsId, constants);
-				request.setAttribute("constantsId", constantsId);
-				request.setAttribute("username", username);
-				request.setAttribute("accountId", accountId);
-				request.getRequestDispatcher("WithdrawalPage.jsp").forward(request, response);
+				request.setAttribute(CONSTANTS_ID, constantsId);
+				request.setAttribute(USERNAME, username);
+				request.setAttribute(ACCOUNT_ID, accountId);
+				request.getRequestDispatcher(WITHDRAWAL_PAGE_JSP).forward(request, response);
 			}
-			Double withdrawalAmount = Double.parseDouble(request.getParameter("withdrawalAmount")); 
+			Double withdrawalAmount = Double.parseDouble(request.getParameter(WITHDRAWAL_AMOUNT)); 
 			if(withdrawalAmount<=0) {
-				JOptionPane.showMessageDialog(null, "Withdrawal amount must be greater than zero..", 
-						"Error",JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(null, MESSAGE_WITHDRAWAL_AMOUNT_MUST_BE_GREATER_THAN_ZERO, 
+						ERROR,JOptionPane.ERROR_MESSAGE);
 				request.getSession().setAttribute(constantsId, constants);
-				request.setAttribute("constantsId", constantsId);
-				request.setAttribute("username", username);
-				request.setAttribute("accountId", accountId);
-				request.getRequestDispatcher("WithdrawalPage.jsp").forward(request, response);
+				request.setAttribute(CONSTANTS_ID, constantsId);
+				request.setAttribute(USERNAME, username);
+				request.setAttribute(ACCOUNT_ID, accountId);
+				request.getRequestDispatcher(WITHDRAWAL_PAGE_JSP).forward(request, response);
 			}else if(withdrawalAmount>balance) {
-				JOptionPane.showMessageDialog(null, "Insufficient balance to proceed with withdrawal..", 
-						"Error",JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(null, MESSAGE_INSUFFICIENT_BALANCE_FOR_WITHDRAWAL, 
+						ERROR,JOptionPane.ERROR_MESSAGE);
 				request.getSession().setAttribute(constantsId, constants);
-				request.setAttribute("constantsId", constantsId);
-				request.setAttribute("username", username);
-				request.setAttribute("accountId", accountId);
-				request.getRequestDispatcher("WithdrawalPage.jsp").forward(request, response);
+				request.setAttribute(CONSTANTS_ID, constantsId);
+				request.setAttribute(USERNAME, username);
+				request.setAttribute(ACCOUNT_ID, accountId);
+				request.getRequestDispatcher(WITHDRAWAL_PAGE_JSP).forward(request, response);
 			}else {
 				transactionServices.withdrawalAmount(accountId, withdrawalAmount);
-				request.setAttribute("balance", String.format("%.2f", balance));
-				request.setAttribute("constantsId", constantsId);
-				request.setAttribute("username", username);
-				request.setAttribute("accountId", accountId);
-				request.getRequestDispatcher("CheckBalancePage.jsp").forward(request, response);
+				request.setAttribute(BALANCE, String.format("%.2f", balance));
+				request.setAttribute(CONSTANTS_ID, constantsId);
+				request.setAttribute(USERNAME, username);
+				request.setAttribute(ACCOUNT_ID, accountId);
+				request.getRequestDispatcher(CHECK_BALANCE_PAGE_JSP).forward(request, response);
 			}	
 		}
-		else if(request.getParameter("homePage")!=null) {
-			request.setAttribute("constantsId", constantsId);
-			request.setAttribute("username", username);
-			request.setAttribute("accountId", accountId);
-			request.getRequestDispatcher("HomePage.jsp").forward(request, response);
+		else if(request.getParameter(HOME_PAGE)!=null) {
+			request.setAttribute(CONSTANTS_ID, constantsId);
+			request.setAttribute(USERNAME, username);
+			request.setAttribute(ACCOUNT_ID, accountId);
+			request.getRequestDispatcher(HOME_PAGE_JSP).forward(request, response);
 		}
 	}
 

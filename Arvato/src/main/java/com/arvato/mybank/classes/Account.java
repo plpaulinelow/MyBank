@@ -2,14 +2,19 @@ package com.arvato.mybank.classes;
 
 import java.io.Serializable;
 
+/**
+ * Account Class
+ * @author paulinelow
+ *
+ */
 public class Account implements Serializable{
 
 	private static final long serialVersionUID = 1L;
 	private Integer accountId;
 	private Double balance;
 	
-	public Account(Integer accountId2) {
-		this.accountId = accountId2;
+	public Account(Integer accountId) {
+		this.accountId = accountId;
 		this.balance = 0.0;
 	}
 	public Account() {

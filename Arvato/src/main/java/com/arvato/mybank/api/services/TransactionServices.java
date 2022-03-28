@@ -1,5 +1,9 @@
 package com.arvato.mybank.api.services;
-
+/**
+ * Interface for TransactionServices
+ * @author paulinelow
+ *
+ */
 public interface TransactionServices {
 	/**
 	 * To check the account balance

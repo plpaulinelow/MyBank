@@ -1,7 +1,11 @@
 package com.arvato.mybank.classes;
 
 import java.io.Serializable;
-
+/**
+ * User Class
+ * @author paulinelow
+ *
+ */
 public class User implements Serializable{
 	private static final long serialVersionUID = 1L;
 	private String username;

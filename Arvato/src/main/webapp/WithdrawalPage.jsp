@@ -14,7 +14,7 @@
 		
 		<p>Withdrawal Amount (RM): </p>
 		<input type="number" step="0.01" value="0.00" placeholder="0.00" min="0" name="withdrawalAmount"></input>
-		<input type="submit" name=withdraw value="Confirm">
+		<input type="submit" name=withdrawal value="Confirm">
 		<input type="submit" name="homePage" value="Back to Home Page" />
 	</form>
 </body>

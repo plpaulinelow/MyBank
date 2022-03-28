@@ -7,10 +7,17 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-
+import static com.arvato.mybank.constants.Constants.CONSTANTS_ID;
+import static com.arvato.mybank.constants.Constants.USERNAME;
+import static com.arvato.mybank.constants.Constants.ACCOUNT_ID;
+import static com.arvato.mybank.constants.Constants.HOME_PAGE;
+import static com.arvato.mybank.constants.Constants.HOME_PAGE_JSP;
 import com.arvato.mybank.constants.Constants;
-
+/**
+ * CheckBalance controller
+ * @author paulinelow
+ *
+ */
 @WebServlet("/checkBalancePage")
 public class CheckBalancePage extends HttpServlet{
 
@@ -21,17 +28,16 @@ public class CheckBalancePage extends HttpServlet{
 	}
 	
 	public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException{	
-		HttpSession ses = request.getSession();
-		String constantsId = request.getParameter("constantsId");
-		String username = request.getParameter("username");
-		Integer accountId = Integer.parseInt(request.getParameter("accountId"));
+		String constantsId = request.getParameter(CONSTANTS_ID);
+		String username = request.getParameter(USERNAME);
+		Integer accountId = Integer.parseInt(request.getParameter(ACCOUNT_ID));
 		Constants constants = (Constants) request.getSession().getAttribute(constantsId);		
-		if(request.getParameter("homePage")!=null) {
+		if(request.getParameter(HOME_PAGE)!=null) {
 			request.getSession().setAttribute(constantsId, constants);
-			request.setAttribute("constantsId", constantsId);
-			request.setAttribute("username", username);
-			request.setAttribute("accountId", accountId);
-			request.getRequestDispatcher("HomePage.jsp").forward(request, response);
+			request.setAttribute(CONSTANTS_ID, constantsId);
+			request.setAttribute(USERNAME, username);
+			request.setAttribute(ACCOUNT_ID, accountId);
+			request.getRequestDispatcher(HOME_PAGE_JSP).forward(request, response);
 		}
 	}
 }
